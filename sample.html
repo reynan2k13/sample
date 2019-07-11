@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+<body>
+
+<div ng-app="myApp" ng-controller="myCtrl">
+
+    <input type="submit" ng-click="placePos()" value="PLACE"></input>
+    <input ng-model="pos.string"></input>
+    <br> </br>
+    <input ng-model="face" type="submit" ng-click="movePos()" value="MOVE"></input> 
+    <br> </br>
+    <input ng-model="rotateL" type="submit" ng-click="rotateLeft()" value="ROTATE LEFT"></input> 
+    <input ng-model="rotateR" type="submit" ng-click="rotateRight()" value="ROTATE RIGHT"></input> 
+    <br> </br>
+    <input ng-model="report" type="submit" ng-click="reportPos()" value="REPORT"></input>
+    <p ng-if="results[0].Y >= 0"> {{ results[0].X + "," + results[0].Y + "," + results[0].FACE}} </p>
+
+</div>
+
+<script>
+var app = angular.module('myApp', []);
+
+
+app.controller('myCtrl', function($scope) {
+    $scope.results = [];
+	$scope.pos = {
+	 	string : '0,0,NORTH'
+	}
+   
+    // PLACE
+    $scope.placePos = function() {
+    	$scope.results = [];
+    	$scope.newPosition = {
+    		X : 0	,
+    		Y	: 0,
+    		'FACE' : 'NORTH'
+    	};
+    	var str = $scope.pos.string
+    	// check X , Y and face only
+    	
+    	if($scope.pos.string !== "" ){
+    		console.log('val>' ,  $scope.pos.string)
+    		var strPlace = $scope.pos.string;
+    		var myarray = strPlace.split(',');
+    		var isValidPosition = true // check is valid input
+    		for (var i = 0; i < 3; i++) {
+	    		if(i===0){
+	    			if(parseInt(myarray[i]) <= 4 && parseInt(myarray[i]) >= 0){
+	    				$scope.newPosition.X = parseInt(myarray[i]);
+	    			}else{
+	    				isValidPosition = false;
+	    				$scope.results.push("INVALID X position")
+	    				$scope.newPosition.X = 'INVALID';
+	    			}
+	    			
+	    		}else if(i === 1){
+	    			if(parseInt(myarray[i]) <= 4 && parseInt(myarray[i]) >= 0){
+	    				$scope.newPosition.Y = parseInt(myarray[i]);
+	    			}else{
+	    				isValidPosition = false;
+	    				$scope.results.push("INVALID Y position")
+	    				$scope.newPosition.Y = 'INVALID';
+	    			}
+	    		}
+	    		else{
+	    			var face = myarray[i].toUpperCase();
+	    			var validFace = ['NORTH' , 'SOUTH' ,'EAST' ,'WEST'];
+					var isFind = false;
+	    			for(var x= 0; x<validFace.length; x++){
+	    				if(validFace[x] === myarray[i].toUpperCase()){
+	    					isFind = true;
+	    					break;
+	    				}
+	    			}
+	    			if(isFind){
+	    				$scope.newPosition.FACE = (myarray[i].toUpperCase());
+	    			}else{
+	    				isValidPosition = false;
+	    				$scope.results.push("INVALID FACE position");
+	    				$scope.newPosition.FACE = 'INVALID';
+	    			}
+	    			
+	    		}
+	    	}
+
+
+
+    	}else{
+    		$scope.results = [];
+    		$scope.results.push("INVALID")
+    		console.log("$scope.newPosition=======", "INVALID")
+    	}
+    };
+
+
+    
+    // MOVE
+    $scope.movePos = function () {
+    	if($scope.newPosition !== undefined){
+	    	if($scope.newPosition.X !== "INVALID" && $scope.newPosition.Y !== "INVALID" && $scope.newPosition.FACE !== "INVALID"){ 
+	    		console.log("Move==========", $scope.newPosition.X)
+	    		$scope.results = [];
+	    		switch($scope.newPosition.FACE){
+	    			case "NORTH":
+	    				if($scope.newPosition.Y + 1 !== 5){
+	    					$scope.newPosition.Y = $scope.newPosition.Y + 1
+	    				}
+	    				break;
+	    			case 'SOUTH':
+	    				if($scope.newPosition.Y - 1 !== -1){
+	    					$scope.newPosition.Y = $scope.newPosition.Y - 1
+	    				}
+	    				break;
+	    			case 'EAST':
+	    				if($scope.newPosition.X + 1 !== 5){
+	    					$scope.newPosition.X = $scope.newPosition.X + 1
+	    				}
+	    				break;
+	    			case 'WEST':
+	    				if($scope.newPosition.X - 1 !== -1){
+	    					$scope.newPosition.X = $scope.newPosition.X - 1
+	    				}
+	    				break;
+	    		}
+
+	    	}else{
+	    		$scope.results = [];
+	    		$scope.results.push('INVALID');
+	    	}
+    	}
+    	else{
+    		$scope.results.push('INVALID 1st select PLACE');
+    	}
+    };
+
+    // REPORT
+    $scope.reportPos = function () {
+    	$scope.results = [];
+        $scope.results.push($scope.newPosition);
+
+    };
+
+    $scope.rotateLeft = function () {
+    	$scope.results = [];
+		if($scope.newPosition !== undefined){
+			switch($scope.newPosition.FACE){
+    			case "NORTH":
+    				$scope.newPosition.FACE = 'WEST';
+    				break;
+    			case 'SOUTH':
+    				$scope.newPosition.FACE = 'EAST';
+    				break;
+    			case 'EAST':
+    				$scope.newPosition.FACE = 'NORTH';
+    				break;
+    			case 'WEST':
+    				$scope.newPosition.FACE = 'SOUTH';
+    				break;
+			}
+		}
+    };
+
+    $scope.rotateRight = function () {
+    	$scope.results = [];
+		if($scope.newPosition !== undefined){
+			switch($scope.newPosition.FACE){
+    			case "NORTH":
+    				$scope.newPosition.FACE = 'EAST';
+    				break;
+    			case 'SOUTH':
+    				$scope.newPosition.FACE = 'WEST';
+    				break;
+    			case 'EAST':
+    				$scope.newPosition.FACE = 'SOUTH';
+    				break;
+    			case 'WEST':
+    				$scope.newPosition.FACE = 'NORTH';
+    				break;
+			}
+		}
+    };
+
+
+    
+	
+});
+</script>
+
+</body>
+</html>
+
+
+
+
